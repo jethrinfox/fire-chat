@@ -1,24 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useContext } from 'react'
+
+// Components
+import Header from './components/Header';
+import ChatRoom from './components/ChatRoom';
+import SignIn from './components/SignIn';
+import { GlobalContext } from './context/GlobalState';
+
 
 function App() {
+
+  const { user } = useContext(GlobalContext)
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className="App">
+        <Header />
+
+        <section>
+          {user ? <ChatRoom /> : <SignIn />}
+        </section>
+      </div>
+      <div class="bg"></div>
+    </>
   );
 }
 
