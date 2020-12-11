@@ -1,28 +1,18 @@
-import React, { useRef, useState } from 'react'
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import React, { useContext, useRef, useState } from 'react'
+import { GlobalContext } from '../context/GlobalState';
 import ChatMessage from './ChatMessage'
 
-const ChatRoom = ({ firestore, currentUser, auth }) => {
+const ChatRoom = () => {
 
-    const dummy = useRef();
+    const dummy = useRef()
     const [formValue, setFormValue] = useState('');
+    const { sendMessage, messages, user } = useContext(GlobalContext);
 
-    // Messages 
-    const messagesRef = firestore.collection('messages')
-    const query = messagesRef.orderBy('createdAt').limit(25)
-    const [messages] = useCollectionData(query, { idField: "id" })
 
-    const sendMessage = async (e) => {
+    const handleMessage = async (e) => {
         e.preventDefault();
 
-        const { uid, photoURL } = auth.currentUser;
-
-        await messagesRef.add({
-            text: formValue,
-            createdAt: firestore.FieldValue.serverTimestamp(),
-            uid,
-            photoURL
-        })
+        await sendMessage(formValue)
 
         setFormValue('');
         dummy.current.scrollIntoView({ behavior: 'smooth' });
@@ -33,13 +23,16 @@ const ChatRoom = ({ firestore, currentUser, auth }) => {
         <>
             <main>
 
-                {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+                {messages && messages.map((msg, idx) => {
+                    const messageClass = msg.uid === user.uid ? 'sent' : 'received'
+                    return <ChatMessage key={idx} message={msg} messageClass={messageClass} />
+                })}
 
                 <span ref={dummy}></span>
 
             </main>
 
-            <form onSubmit={sendMessage}>
+            <form onSubmit={handleMessage}>
 
                 <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
 

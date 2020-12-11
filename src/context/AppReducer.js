@@ -6,6 +6,11 @@ export default (state, action) => {
                 ...state,
                 user: action.payload,
             }
+        case 'MESSAGES_CHANGE':
+            return {
+                ...state,
+                messages: action.payload,
+            }
         default:
             return state;
     }

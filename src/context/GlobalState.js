@@ -1,9 +1,9 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import AppReducer from './AppReducer';
-import { auth, githubAuthProvider, googleAuthProvider } from '../config/firebase'
+import { auth, firestore, googleProvider, githubProvider, TimeStamp } from '../config/firebase'
 // Firebase Hooks
 import { useAuthState } from 'react-firebase-hooks/auth'
-// import { useCollectionData } from 'react-firebase-hooks/firestore'
+import { useCollectionData } from 'react-firebase-hooks/firestore'
 
 // Initial state
 const initialState = {
@@ -17,27 +17,47 @@ export const GlobalContext = createContext(initialState);
 // Provider component
 export const GlobalProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AppReducer, initialState);
-    const { user } = useAuthState(auth)
+    const [user] = useAuthState(auth);
+
+    const messagesRef = firestore.collection('messages');
+    const query = messagesRef.orderBy('createdAt', "asc").limit(25);
+    const [messages] = useCollectionData(query);
+
 
     useEffect(() => {
-        dispatch({
-            type: "USER_CHANGE",
-            payload: user
-        })
-        console.log("user", user);
+        if (user) {
+            console.log(user);
+            dispatch({
+                type: "USER_CHANGE",
+                payload: user
+            })
+        }
     }, [user])
 
+    useEffect(() => {
+        if (messages) {
+            console.log("messages", messages);
+            dispatch({
+                type: "MESSAGES_CHANGE",
+                payload: messages
+            })
+        }
+    }, [messages])
+
+
     async function signIn(provider) {
-        console.log("signIn: ", provider);
         switch (provider) {
             case 'google':
-                auth.signInWithPopup(googleAuthProvider)
+                console.log("signIn: ", provider);
+                await auth.signInWithPopup(googleProvider)
                 break;
             case 'github':
-                auth.signInWithPopup(githubAuthProvider)
+                console.log("signIn: ", provider);
+                await auth.signInWithPopup(githubProvider)
                 break;
             case 'anonymous':
-                auth.signInAnonymously()
+                console.log("signIn: ", provider);
+                await auth.signInAnonymously()
                 break;
             default:
                 break;
@@ -53,12 +73,29 @@ export const GlobalProvider = ({ children }) => {
         })
     }
 
+    async function sendMessage(text) {
+        console.log("sendMessage");
+        const { uid, photoURL } = state.user;
+
+
+        const newMessage = {
+            text,
+            createdAt: TimeStamp,
+            uid,
+            photoURL: photoURL === null ? "https://ssl.gstatic.com/docs/common/profile/alligator_lg.png" : photoURL
+        }
+
+        await messagesRef.add(newMessage)
+    }
+
 
     return (<GlobalContext.Provider value={{
         user: state.user,
         messages: state.messages,
         signIn,
         signOut,
+        sendMessage,
+
     }}>
         {children}
     </GlobalContext.Provider>);

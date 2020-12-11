@@ -21,7 +21,7 @@ function App() {
           {user ? <ChatRoom /> : <SignIn />}
         </section>
       </div>
-      <div class="bg"></div>
+
     </>
   );
 }

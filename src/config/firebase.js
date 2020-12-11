@@ -15,12 +15,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const firestore = firebase.firestore();
-const analytics = firebase.analytics();
+const firestore = app.firestore()
+const auth = app.auth()
 
-const googleAuthProvider = new firebase.auth.GoogleAuthProvider()
-const githubAuthProvider = new firebase.auth.GithubAuthProvider()
+const TimeStamp = firebase.firestore.FieldValue.serverTimestamp()
+
+const googleProvider = new firebase.auth.GoogleAuthProvider()
+const githubProvider = new firebase.auth.GithubAuthProvider()
+const facebookProvider = new firebase.auth.FacebookAuthProvider()
 
 
-export { googleAuthProvider, githubAuthProvider, app, auth, firestore, analytics }
+export { app, firestore, auth, googleProvider, githubProvider, facebookProvider, TimeStamp }
