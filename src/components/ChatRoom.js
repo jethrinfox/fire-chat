@@ -24,8 +24,7 @@ const ChatRoom = () => {
             <main>
 
                 {messages && messages.map((msg, idx) => {
-                    const messageClass = msg.uid === user.uid ? 'sent' : 'received'
-                    return <ChatMessage key={idx} message={msg} messageClass={messageClass} />
+                    return <ChatMessage key={idx} message={msg} userUid={user.uid} />
                 })}
 
                 <span ref={dummy}></span>

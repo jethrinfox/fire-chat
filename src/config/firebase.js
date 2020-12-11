@@ -18,7 +18,7 @@ const app = firebase.initializeApp(firebaseConfig);
 const firestore = app.firestore()
 const auth = app.auth()
 
-const TimeStamp = firebase.firestore.FieldValue.serverTimestamp()
+const TimeStamp = firebase.firestore.FieldValue
 
 const googleProvider = new firebase.auth.GoogleAuthProvider()
 const githubProvider = new firebase.auth.GithubAuthProvider()

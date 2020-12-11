@@ -26,7 +26,6 @@ export const GlobalProvider = ({ children }) => {
 
     useEffect(() => {
         if (user) {
-            console.log(user);
             dispatch({
                 type: "USER_CHANGE",
                 payload: user
@@ -35,14 +34,13 @@ export const GlobalProvider = ({ children }) => {
     }, [user])
 
     useEffect(() => {
-        if (messages) {
-            console.log("messages", messages);
+        if (messages && user) {
             dispatch({
                 type: "MESSAGES_CHANGE",
                 payload: messages
             })
         }
-    }, [messages])
+    }, [messages, user])
 
 
     async function signIn(provider) {
@@ -75,14 +73,15 @@ export const GlobalProvider = ({ children }) => {
 
     async function sendMessage(text) {
         console.log("sendMessage");
-        const { uid, photoURL } = state.user;
+        const { uid, photoURL, displayName } = state.user;
 
 
         const newMessage = {
             text,
-            createdAt: TimeStamp,
+            createdAt: TimeStamp.serverTimestamp(),
             uid,
-            photoURL: photoURL === null ? "https://ssl.gstatic.com/docs/common/profile/alligator_lg.png" : photoURL
+            userName: displayName ? displayName : "Anonymous",
+            photoURL: photoURL === null ? "https://ssl.gstatic.com/docs/common/profile/alligator_lg.png" : photoURL,
         }
 
         await messagesRef.add(newMessage)
